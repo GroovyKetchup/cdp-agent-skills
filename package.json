@@ -16,7 +16,9 @@
     "src",
     "skills",
     "references",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"

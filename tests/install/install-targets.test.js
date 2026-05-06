@@ -6,6 +6,32 @@ import test from 'node:test';
 
 import { installSkills } from '../../src/install.js';
 
+const expectedReferences = {
+  'cdp-component-getting-started': [
+    'project-structure.md',
+    'manifest-minimum.md',
+    'component-package-plugin.md',
+    'build-config.md',
+    'validation.md',
+  ],
+  'cdp-component-add-to-existing-package': [
+    'existing-package-discovery.md',
+    'add-component-minimum.md',
+    'registration-and-validation.md',
+  ],
+  'cdp-component-manifest-basics': ['manifest-basics.md'],
+  'cdp-component-traits': ['traits.md'],
+  'cdp-component-events-actions-state': ['events-actions-state.md'],
+  'cdp-component-slots': ['slots.md'],
+  'cdp-component-runtime-behavior': ['runtime-behavior.md'],
+  'cdp-component-adapter-and-wrap': ['adapter-and-wrap.md'],
+  'cdp-component-manifest-validation': [
+    'validation-script.md',
+    'validation-rules.md',
+    'diagnostics.md',
+  ],
+};
+
 async function tempWorkspace() {
   return mkdtemp(path.join(tmpdir(), 'cdp-agent-skills-'));
 }
@@ -29,8 +55,19 @@ test('installs all skills to a skills-directory agent target', async () => {
     cwd,
   });
 
-  assert.equal(result.installed.length, 7);
+  assert.equal(result.installed.length, 9);
   assert.equal(await exists(path.join(cwd, '.windsurf/skills/cdp-component-getting-started/SKILL.md')), true);
+
+  for (const [skillId, references] of Object.entries(expectedReferences)) {
+    for (const reference of references) {
+      const installedReference = path.join(cwd, '.windsurf/skills', skillId, 'references', reference);
+      assert.equal(await exists(installedReference), true);
+      const content = await readFile(installedReference, 'utf8');
+      assert.match(content, /sdk-docs:[\s\S]*?cdp-material-sdk\/docs\/component-development\//);
+      assert.match(content, /本文件只提供 SDK 文档导航/);
+      assert.doesNotMatch(content, /source: docs\/组件开发\//);
+    }
+  }
 });
 
 test('installs a subset to qwen-code target', async () => {
@@ -45,7 +82,7 @@ test('installs a subset to qwen-code target', async () => {
 
   assert.deepEqual(result.installed, ['cdp-component-getting-started']);
   assert.equal(await exists(path.join(cwd, '.qwen/skills/cdp-component-getting-started/SKILL.md')), true);
-  assert.equal(await exists(path.join(cwd, '.qwen/skills/cdp-component-wrap-react-library/SKILL.md')), false);
+  assert.equal(await exists(path.join(cwd, '.qwen/skills/cdp-component-adapter-and-wrap/SKILL.md')), false);
 });
 
 test('installs Antigravity resources and AGENTS.md managed block', async () => {

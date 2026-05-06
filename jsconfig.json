@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "checkJs": false,
+    "allowJs": true,
+    "noEmit": true,
+    "target": "ES2022",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "tests/install/**/*"],
+  "exclude": ["node_modules", "tests/e2e-fixtures"]
+}

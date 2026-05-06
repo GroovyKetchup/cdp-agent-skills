@@ -1,56 +1,104 @@
 ---
 name: cdp-component-add-to-existing-package
-description: Adds a new component to an existing CDP component package without rebuilding the whole project. Use when the user has an existing CDP component package and wants to add, register, validate, or minimally wire one new component.
+description: Use when a repository already contains a CDP component package and the task is to add, register, minimally wire and validate ONE new component without restructuring the package.
 ---
 
-# Add Component to Existing CDP Package
+# 向已有 CDP 组件包新增组件
 
-## When to use
+## 概述
 
-Use this skill when the repository already contains CDP package structure and the task is to add a new component to it.
+主线 skill：仓库已有 CDP 组件包结构、用户只想**新增 + 注册 + 验证一个组件**时使用。本 skill 只做工作流程编排与注册清单——具体能力实现走对应原子 skill。
 
-Do not recreate the component library, replace package tooling, or rewrite unrelated package registration files unless the user asks for that.
+**绝不**重建组件库结构、替换构建工具、改写无关组件，除非用户明确要求。
 
-## Workflow
+## 何时使用 / 何时不使用
 
-1. Locate the existing package conventions.
-   - Find the current component directory pattern.
-   - Find where component manifests are aggregated.
-   - Find the plugin entry that calls package registration.
+| 情境 | 是否使用本 skill |
+|---|---|
+| 已有 CDP 包结构，新增 1 个组件 | ✅ 使用 |
+| 从零创建 CDP 组件包 | ❌ 走 `cdp-component-getting-started` |
+| 仅修改现有组件 | ❌ 直接走对应原子 skill |
+| 排查现有组件故障 | ❌ 走 `cdp-component-manifest-validation` |
 
-2. Add only the new component files.
-   - Create a focused component directory.
-   - Add `index.tsx` or equivalent implementation.
-   - Add `manifest.ts` beside the component.
-   - Follow existing naming and namespace conventions.
+## 工作流程
 
-3. Register the component.
-   - Add the component and manifest to the existing package aggregation.
-   - Keep existing package metadata and existing components unchanged.
-   - Ensure the component `type` is stable and namespaced.
+1. **发现现有注册约定**（不要假设）：
+   - 找组件目录布局（如 `src/components/<Name>/index.tsx` + `manifest.ts`）
+   - 找 manifest 聚合文件 / 组件清单数组
+   - 找 plugin.ts / 注册入口（调用 SDK 注册函数处）
+   - 复用现有命名空间、命名风格、文件层级
 
-4. Implement the minimum runnable contract.
-   - Use React `forwardRef` when the component exposes root DOM or actions/state.
-   - Pass root injection props to the real DOM root when rootPath is declared.
-   - Add optional capabilities only when the component actually needs them.
+2. **只添加新组件所需文件**：
+   - 新组件目录 + `index.tsx`（或等价实现）+ `manifest.ts`
+   - 不动其他组件、不改包级元数据
 
-5. Validate.
-   - Run the package's manifest validation command if present.
-   - Otherwise run `validateManifest()` for the new manifest.
-   - Build or type-check with the package's existing command when available.
+3. **注册新组件**：
+   - 将新组件实现 + manifest 加入聚合文件
+   - 组件 `type` **稳定、全局唯一、带命名空间前缀**（如 `acme:card`）
+   - 保留已有组件元数据不变
 
-## Completion checklist
+4. **按需实现最小契约**——根据组件实际需求**裁剪**能力，并跳到对应原子 skill：
 
-- [ ] Only the new component and required registration files changed.
-- [ ] The component manifest is included in the existing package aggregation.
-- [ ] The component `type` is stable, unique, and namespaced.
-- [ ] Optional capabilities are not added without a clear reason.
-- [ ] `validateManifest()` has no error for the new manifest.
-- [ ] Existing components were not rewritten.
+   | 需求 | 原子 skill |
+   |---|---|
+   | 必填字段（type / meta.title / meta.category / props / designer meta） | `cdp-component-manifest-basics` |
+   | 数据语义（DATA_FIELD / DATA_CONTAINER / DataScope） | `cdp-component-traits` |
+   | 命名 / 动态 / 作用域 slots | `cdp-component-slots` |
+   | 自定义事件 / 命令式 actions / 暴露 state | `cdp-component-events-actions-state` |
+   | rootPath / Loading 策略 | `cdp-component-runtime-behavior` |
+   | 包装第三方组件 / API 适配 | `cdp-component-adapter-and-wrap` |
 
-## Authoritative sources
+   **不要凭直觉全加**——能力按"组件真实需要"裁剪。
 
-- `docs/组件开发/getting-started/02-创建组件包并注册.md`
-- `docs/组件开发/getting-started/03-开发最小可运行组件.md`
-- `docs/组件开发/getting-started/05-自检与排错.md`
-- `docs/组件开发/reference/示例代码索引.md`
+5. **校验新增内容**：
+   - 优先运行项目已有的校验脚本（如 `pnpm validate-manifests`）
+   - 没有脚本时从 `cdp-material-sdk/portable` 导入 `validateManifest` 跑校验（见 `cdp-component-manifest-validation`）
+   - 项目已有 typecheck / build 也一并运行
+
+## SDK 导入边界
+
+新组件实现复用现有包的导入约定：默认从 `cdp-material-sdk/portable` 导入 manifest 类型、`COMPONENT_TRAIT` / `COMPONENT_CATEGORY` / `INJECT_PATH_SLOT_PROPS` 常量、`validateManifest` 等；只有在确认与宿主共享 React 运行时与 Context 身份时才用 `cdp-material-sdk/host-react`（数据容器场景）。不导入宿主内部模块或 SDK 源码路径。
+
+## 命名空间与 type 唯一性
+
+- `type` 必须**全局唯一**且**带命名空间前缀**（推荐组织或包名前缀，如 `acme:card`、`order:approvalPanel`）。
+- 复用现有包内已有的命名风格——查看其他组件的 `type` 命名后照搬模式。
+
+## 引导路径
+
+事实源（优先读取目标项目本地 SDK 文档）：
+
+- `node_modules/cdp-material-sdk/docs/component-development/getting-started/02-创建组件包并注册.md`
+- `node_modules/cdp-material-sdk/docs/component-development/getting-started/03-开发最小可运行组件.md`
+- `node_modules/cdp-material-sdk/docs/component-development/reference/示例代码索引.md`
+
+本 skill 的 `references/`（`existing-package-discovery.md` / `add-component-minimum.md` / `registration-and-validation.md`）仅作为 SDK 文档导航与 fallback 提示。
+
+## 常见错误
+
+| 错误 | 修复 |
+|---|---|
+| 重建包结构 / 替换构建工具 | 用户没要求时不动；只新增 |
+| 改写不相关组件 | 同上 |
+| 创建文件但忘加入聚合文件 / plugin.ts | 第 3 步注册 |
+| 复用其他组件 type 字符串 | 给新组件独立 type |
+| `type` 漏命名空间前缀 | 加组织或包名前缀 |
+| 复制粘贴老组件后未清理无关 trait / event / action | 按"按需裁剪"原则只保留新组件需要的 |
+| 凭直觉全加能力 | 按"需求 → 原子 skill"表逐项判断 |
+| 跳过 validateManifest | 第 5 步必跑 |
+
+## 完成检查
+
+- [ ] 仅改动新组件文件 + 必要的注册聚合 / plugin 入口
+- [ ] 已有组件 / 包元数据 / 构建配置未动
+- [ ] `type` 稳定、全局唯一、带命名空间前缀
+- [ ] 未凭直觉添加无关能力（按需要走对应原子 skill）
+- [ ] 新 manifest 通过 `validateManifest()`
+- [ ] 项目已有 typecheck / build 已通过
+
+## 维护来源
+
+- `cdp-material-sdk/docs/component-development/getting-started/02-创建组件包并注册.md`
+- `cdp-material-sdk/docs/component-development/getting-started/03-开发最小可运行组件.md`
+- `cdp-material-sdk/docs/component-development/reference/示例代码索引.md`
+- `cdp-material-sdk/docs/component-development/reference/SDK导入边界.md`

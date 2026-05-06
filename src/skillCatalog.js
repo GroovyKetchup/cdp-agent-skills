@@ -6,10 +6,12 @@ import { skillsRoot } from './paths.js';
 export const SKILL_IDS = [
   'cdp-component-getting-started',
   'cdp-component-add-to-existing-package',
-  'cdp-component-wrap-react-library',
-  'cdp-component-data-field-container',
-  'cdp-component-actions-state-events-slots',
-  'cdp-component-rootpath-loading',
+  'cdp-component-manifest-basics',
+  'cdp-component-traits',
+  'cdp-component-events-actions-state',
+  'cdp-component-slots',
+  'cdp-component-runtime-behavior',
+  'cdp-component-adapter-and-wrap',
   'cdp-component-manifest-validation',
 ];
 

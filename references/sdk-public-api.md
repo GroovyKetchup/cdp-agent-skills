@@ -44,4 +44,4 @@ import type { ComponentManifest, EngineComponentPlugin } from 'cdp-material-sdk/
 
 ## 当前参考版本
 
-当前组件开发文档验证的 SDK 版本为 `cdp-material-sdk@0.0.4`。
+当前组件开发文档验证的 SDK 版本为 `cdp-material-sdk@latest`。

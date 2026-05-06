@@ -1,0 +1,11 @@
+{
+  "name": "@vendor-x/button",
+  "version": "1.0.0",
+  "description": "第三方按钮（stub，用于 cdp-agent-skills 端到端测试）",
+  "type": "module",
+  "main": "./button.tsx",
+  "types": "./button.tsx",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

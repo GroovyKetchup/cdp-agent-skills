@@ -1,0 +1,11 @@
+{
+  "name": "@vendor-x/date-picker",
+  "version": "1.0.0",
+  "description": "第三方日期选择器（stub，用于 cdp-agent-skills 端到端测试）",
+  "type": "module",
+  "main": "./date-picker.tsx",
+  "types": "./date-picker.tsx",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

@@ -12,8 +12,8 @@
 
 | 维度 | 关注 |
 |---|---|
-| CDP 契约落地 (50) | 三层决策表：**结构** wrapper（forwardRef + 外层 DOM + spread `slotProps.root`，不传给 vendor）；**Props** wrapper 内做值类型转换（number ↔ Date），不用 propMapping 改值；**事件** `adapter.events.valueChange.propName: 'onDateChange'` + `transform`，事件已在 manifest `events` 声明；rootPath = `INJECT_PATH_SLOT_PROPS` |
-| 漏洞回避 (30) | 用 `propMapping` 试图改值类型；wrapper 里手写所有事件适配；`slotProps.root` 直接传给 vendor；`adapter.events` 引用未声明事件；重复声明 DATA_FIELD 自动注入的 `valueChange` |
+| CDP 契约落地 (50) | 三层决策表：**结构** wrapper（forwardRef + 外层 DOM + spread `slotProps.root`，不传给 vendor）；**Props** 在 wrapper / transform 里做 vendor `Date` ↔ CDP `valueSchema` 选定类型 的双向转换（valueSchema 类型 number/string/object 由 Agent 选，前后一致即可，不用 `propMapping` 转值）；**事件** `adapter.events.valueChange.propName: 'onDateChange'` + `transform`（按所选 valueSchema 类型从 Date 转换），事件已在 manifest `events` 声明；rootPath = `INJECT_PATH_SLOT_PROPS` |
+| 漏洞回避 (30) | 用 `propMapping` 做需要值变换的 prop（`propMapping` 只能改名）；wrapper 里手写所有事件适配；`slotProps.root` 直接传给 vendor；`adapter.events` 引用未声明事件；重复声明 DATA_FIELD 自动注入的 `valueChange`；valueSchema / wrapper / transform 三者类型不自洽 |
 | 任务完成度 (20) | 终止标识最低底线全满足；vendor 字节级未变；`validateManifest(plugin)` 通过；走完 wrap-up |
 | 诊断观测（不计分） | 期望主调 `cdp-component-adapter-and-wrap`，串联 `cdp-component-runtime-behavior`（rootPath） |
 

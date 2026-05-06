@@ -12,7 +12,7 @@
 
 | 维度 | 关注 |
 |---|---|
-| CDP 契约落地 (50) | **只新增**：Card 组件 + manifest 接入既有组件包注册入口；不重写包结构 / plugin / 构建工具；ColorField 字节级未变；trait `[LAYOUT_CONTAINER]`（不要 DATA_CONTAINER）；slots `header`/`footer` 含 `title`；实现侧渲染 `_slots.header` / `_slots.footer`（不用 React children 凑数） |
+| CDP 契约落地 (50) | **只新增**：Card 组件 + manifest 接入既有组件包注册入口；不重写包结构 / plugin / 构建工具；ColorField 字节级未变；trait `[LAYOUT_CONTAINER]`（不要 DATA_CONTAINER）；两个命名 slot（语义上一个对应标题区、一个对应操作区，key 名你定：`header`/`footer` 或 `titleSlot`/`actionSlot` 等）各含 `title`；实现侧用 `_slots[<对应 slot key>]` 渲染两个区域（不用 React children 凑数） |
 | 漏洞回避 (30) | 重建组件包结构 / 替换构建工具；改写 ColorField 等无关组件；创建 manifest 但未接入注册入口；漏 slot `title`；忘渲染 `_slots`；误以为 LAYOUT_CONTAINER 必须配 slots |
 | 任务完成度 (20) | 终止标识最低底线全满足；`validateManifest(plugin)` 通过；走完 wrap-up |
 | 诊断观测（不计分） | 期望主调 `cdp-component-add-to-existing-package`（**不是** getting-started），串联 traits / slots / manifest-basics |

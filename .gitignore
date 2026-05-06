@@ -5,3 +5,5 @@ coverage/
 .tmp/
 
 .git-commit-msg.tmp
+
+commit_msg.txt

@@ -14,7 +14,7 @@
 |---|---|
 | 组件 type 名 | `acme.Button` |
 | Loading 策略选哪个 | 让你按决策表选；vendor 自带 loading prop，按理应该 `native` |
-| readOnly / disabled 怎么处理 | DATA_FIELD 注入 `readOnly`，用 `propMapping: { readOnly: 'disabled' }` 映射 |
+| readOnly / disabled 怎么处理 | DATA_FIELD 注入 `readOnly`；二选一映射到 vendor `disabled`：（1）manifest 用 `adapter.propMapping: { readOnly: 'disabled' }`；（2）wrapper JSX 里手写 `disabled={readOnly}` 透传 |
 | 要不要 click action | 要（用户能在低代码里命令式触发） |
 
 ---
@@ -27,7 +27,7 @@
 | 2. Loading 决策 | `runtime-behavior` Loading 三策略表 | 选 `native`（vendor 自带 loading） |
 | 3. rootPath | `runtime-behavior` rootPath 决策表 | `INJECT_PATH_SLOT_PROPS` + 外层 wrapper DOM（vendor 不接受未知 DOM 属性） |
 | 4. 事件适配 | `adapter-and-wrap` | `adapter.events.click.propName: 'onPress'` |
-| 5. props 适配 | `adapter-and-wrap` | `adapter.propMapping: { readOnly: 'disabled' }` |
+| 5. props 适配 | `adapter-and-wrap` | `readOnly→disabled` 映射：`adapter.propMapping: { readOnly: 'disabled' }` 或 wrapper 内手映射，二选一 |
 | 6. 事件声明 | `events-actions-state` | `events: { click: {} }` 必须先声明 |
 
 ### 期望 manifest 关键片段

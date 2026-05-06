@@ -8,11 +8,14 @@
 
 ## 评分要点
 
+> **结果导向**：契约 50 + 漏洞 30 + 完成 20 = 100。skill 路由仅作诊断观测（不计分）。
+
 | 维度 | 关注 |
 |---|---|
-| 路由 | 主调 `cdp-component-manifest-validation`（症状路由表） → `cdp-component-events-actions-state`（修 actions / state） |
-| 决策 | **不**先改宿主代码 / 不直接看 CDP 引擎源码；**先**校验 manifest（`validateManifest()` + `diagnoseMissingActionImpls()` + `diagnoseMissingStateKeys()`）；区分 error 必修 / warning 建议修；action key 必须 = ref method name |
-| 漏洞 | 直接修宿主代码而不先验证 manifest；不会用 `diagnoseMissing*` 自检；不知 action key = ref method；不区分 error / warning |
+| CDP 契约落地 (50) | 6 处错全修：action key `reset` vs ref `resetValue` 一致；state 在 `[COMPONENT_STATE_KEY]` 下；`useImperativeHandle` 依赖含 `selectedColor`；`actions.reset` 含 `title`；`actions.reset.params.type='object'`；`state.selectedColor` 含 schema；`diagnose*` / `validateManifest` 调用且通过 |
+| 漏洞回避 (30) | 直接修宿主或 CDP 引擎代码而不先验证 manifest；不会用 `diagnoseMissingActionImpls` / `diagnoseMissingStateKeys`；不知 action key = ref method name；不区分 error 必修 / warning 建议修 |
+| 任务完成度 (20) | 终止标识全满足；不重写 ColorField 整体（只改 ref + manifest）；走完 wrap-up |
+| 诊断观测（不计分） | 期望主调 `cdp-component-manifest-validation`，症状路由跳转到 events-actions-state |
 
 完整评分表 → `../../../e2e-evaluation-template.md` "场景 05" 段
 完整设计依据 → `../../../e2e-test-matrix.md` "场景 05" 段

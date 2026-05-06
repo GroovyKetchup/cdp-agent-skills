@@ -52,9 +52,9 @@
 >
 > 3. 把你最后一次跑过的命令的终端完整输出存到 `${RESULTS_DIR}artifacts/terminal-output.txt`（如果本场景没跑过命令就跳过）
 >
-> 4. 在 `${RESULTS_DIR}artifacts/agent-self-report.md` 写一份不超过 200 字的自述，按以下结构（**不要**展开成长文）：
+> 4. 在 `${RESULTS_DIR}artifacts/agent-self-report.md` 写一份不超过 250 字的自述，按以下结构（**不要**展开成长文）：
 >    - 我接到了什么任务（一句话）
->    - 我用了哪些 skill / 资料（按调用顺序列名字，**不**评价对错）
+>    - 我用了哪些 skill / 文档 / 资料（按调用顺序列名字，**不**评价对错；包含但不限于：cdp-agent-skills 中的 skill、`cdp-material-sdk` 源码 / 类型 / 文档、其他 npm 包文档、自身经验等。**全部如实列出**，没用 skill 也照说没用）
 >    - 我做了哪些主要改动（一句话每条，3-7 条）
 >    - 我有哪些不确定 / 没做的（如果有）
 >
@@ -69,7 +69,8 @@
 - **粘贴前**：把 `<results 根>` 和 `<LLM-IDE>` 各 1 处替换好；日期 / 场景名留给 Agent 自己算
 - **Agent 算出 `RESULTS_DIR` 后**：核对一下路径是不是你期望的（场景名是否和当前 fixture 一致、日期是否当天），不对就让它改，对了让它继续
 - **Agent 拒绝**或卡住：可以告诉它"用 PowerShell / shell 执行 mkdir 和 robocopy/rsync"，**不**告诉它该拷哪些具体文件
-- **Agent 写出的 self-report 与你观察的对话不符**：这是有价值的评分信号（路由幻觉 / 后见之明编造），**留着**写进 `score.md` 备注，**不**当场纠正
+- **Agent 写出的 self-report 与你观察的对话不符**：这是有价值的诊断信号（路由幻觉 / 后见之明编造），**留着**写进 `score.md` 的 routing_diagnostics 备注，**不**当场纠正
+- **Agent self-report 说"全靠经验，没用任何 skill"**：这不是失败信号——评分按结果（CDP 契约落地）走，self-report 只用于轨道 B 诊断"替代路径"分布
 - **此 prompt 不计入评分**：评分基于主 prompt（`prompt.md` 的"用户请求"段）完成度，收尾 prompt 只是机械收纳工序
 
 ## 与 transcript.md / score.md 的边界

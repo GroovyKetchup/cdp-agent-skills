@@ -8,11 +8,14 @@
 
 ## 评分要点
 
+> **结果导向**：契约 50 + 漏洞 30 + 完成 20 = 100。skill 路由仅作诊断观测（不计分）。
+
 | 维度 | 关注 |
 |---|---|
-| 路由 | 主调 `cdp-component-runtime-behavior`（Loading 决策）+ `cdp-component-adapter-and-wrap`（事件名 propName） |
-| 决策 | Loading 选 `native`（VendorButton 自带 loading），**不**用 `wrapper`（整体遮罩破坏视觉）；事件 `adapter.events.click.propName: 'onPress'`；rootPath 决策：vendor 不接受未知 DOM 属性，需 wrapper 外层 + `INJECT_PATH_SLOT_PROPS` |
-| 漏洞 | 用 `wrapper` 整体遮罩；用 `native` 但忘"loading 时阻断点击"；把 `INJECT_PATH_SLOT_PROPS` 直接给 vendor；重复声明 `hidden` / `setHidden` / `mount` / `unmount`（引擎自动补充） |
+| CDP 契约落地 (50) | Loading 选 `LOADING_STRATEGY.NATIVE`（vendor 自带）；rootPath = `INJECT_PATH_SLOT_PROPS` + 外层 div spread `slotProps?.root`；事件 `adapter.events.click.propName: 'onPress'`；`propMapping: { readOnly: 'disabled' }`；不重复声明引擎自动能力 |
+| 漏洞回避 (30) | 用 `wrapper` 整体遮罩；把 `INJECT_PATH_SLOT_PROPS` 直接给 vendor；重复声明 `hidden` / `mount` / `unmount`；`adapter.events.click` 引用未声明事件；wrapper 内手写 `onPress={onClick}` 转换；声明 `NATIVE` 但 wrapper 又重复实现 loading state |
+| 任务完成度 (20) | 终止标识最低底线全满足；vendor 字节级未变；`validateManifest(plugin)` 通过；走完 wrap-up |
+| 诊断观测（不计分） | 期望主调 `cdp-component-runtime-behavior` + `cdp-component-adapter-and-wrap`，串联 events-actions-state |
 
 完整评分表 → `../../../e2e-evaluation-template.md` "场景 07" 段
 完整设计依据 → `../../../e2e-test-matrix.md` "场景 07" 段

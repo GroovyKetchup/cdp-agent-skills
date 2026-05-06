@@ -67,6 +67,25 @@
 
 ---
 
+## 终止标识（达到即算场景完成）
+
+| # | 验收项 |
+|---|---|
+| 1 | `src/components/NewActionBar/{index.tsx, manifest.ts}` 新增（OldButton 复制改名而来）|
+| 2 | NewActionBar manifest 已纳入组件包注册入口（具体聚合文件名不限）|
+| 3 | `src/components/OldButton/` **字节级未变** |
+| 4 | `npx tsc --noEmit` 通过 |
+| 5 | `validateManifest(plugin)` 通过 |
+| 6 | NewActionBar manifest **未**含 `engine.render.loading` / `actions.setLoading` / `actions.getLoading` / `state.loading` / `events.focus` / `events.blur` / `props.placeholder` / `adapter.propMapping`（老组件特有 loading & 焦点 & DATA_FIELD 相关项已清理）|
+| 7 | NewActionBar `traits` 含 `INTERACTION_CLICKABLE` 且**不**含 `DATA_FIELD` |
+| 8 | `type` 唯一，不复用 OldButton 的 type；含命名空间前缀（如 `acme.NewActionBar`）|
+| 9 | NewActionBar 不通过 `import` OldButton 实现复用（应是独立复制后的代码）|
+| 10 | Agent 走完 `wrap-up-prompt.md`，输出 artifacts |
+
+**最低底线**：1 + 2 + 3 + 4 + 5 全部满足。
+
+---
+
 ## 必须回避的高置信度漏洞
 
 - 🅰 没移除老组件特有的 trait / event / action / state（配置漂移；validateManifest 可能 warning）

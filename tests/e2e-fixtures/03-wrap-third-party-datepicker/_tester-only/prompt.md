@@ -12,8 +12,8 @@
 
 | Agent 可能问 | 回答 |
 |---|---|
-| CDP 侧 valueSchema 用什么类型？ | 毫秒时间戳 `number` |
-| 默认值？ | `0` |
+| CDP 侧 valueSchema 用什么类型？ | 你定（毫秒时间戳 `number` / ISO 字符串 / 其他可 JSON 序列化的形式都行），只要 wrapper 在事件层 / 渲染层做正确双向转换 |
+| 默认值？ | 与所选 valueSchema 类型对齐的合理初值（如 number→`0`、string→`''`） |
 | 组件 type 名？ | `acme.DatePicker` |
 | 要不要透传 `dateFormat` 等其他 prop？ | 要，至少透传 `dateFormat` 和 `placeholder` |
 | 要不要 clear action？ | 不要（保持最小） |
@@ -25,8 +25,8 @@
 | 层 | 期望选择 | 落地形式 |
 |---|---|---|
 | **结构层** | wrapper（forwardRef + 外层 DOM + `slotProps.root`） | `<div ref={ref} {...slotProps?.root}><ThirdPartyDatePicker .../></div>` |
-| **Props 层** | wrapper 内做值类型转换 | `selectedDate={value ? new Date(value) : null}` → CDP number ↔ vendor Date |
-| **事件层** | `adapter.events.valueChange` | `propName: 'onDateChange'` + `transform: (date) => ({ newValue: date?.getTime() ?? 0, oldValue: ... })` |
+| **Props 层** | wrapper 内做值类型转换 | CDP `valueSchema` 类型 ↔ vendor `Date` 的双向转换（如 number 选项：`selectedDate={value ? new Date(value) : null}`；ISO 字符串选项类似） |
+| **事件层** | `adapter.events.valueChange` | `propName: 'onDateChange'` + `transform: (date) => ({ newValue: <按所选 valueSchema 类型从 Date 转换>, oldValue: ... })` |
 
 manifest 关键字段：
 
@@ -38,13 +38,14 @@ manifest 关键字段：
   meta: {
     title: '日期选择器',
     category: COMPONENT_CATEGORY.DATA_ENTRY,
-    valueSchema: { type: 'number', default: 0 },
+    valueSchema: { type: 'number', default: 0 }, // 示例选 number；string/object 同样可
   },
   events: { valueChange: {} },        // 必须先在 manifest 声明
   adapter: {
     events: {
       valueChange: {
         propName: 'onDateChange',
+        // transform 把 vendor 的 Date 转成 valueSchema 选定类型；下面是 number 选项示例
         transform: (date: Date | null) => ({ newValue: date?.getTime() ?? 0, oldValue: undefined }),
       },
     },
@@ -82,9 +83,9 @@ manifest 关键字段：
 | 3 | `vendor/date-picker.tsx` 字节级未变 |
 | 4 | `npx tsc --noEmit` 通过 |
 | 5 | `validateManifest(plugin)` 通过 |
-| 6 | manifest 含 `adapter.events.valueChange.propName: 'onDateChange'` + `transform`（number ↔ Date 转换）|
+| 6 | manifest 含 `adapter.events.valueChange.propName: 'onDateChange'` + 在事件层做 vendor `Date` ↔ CDP `valueSchema` 的双向适配（valueSchema 具体类型 number/string/object 由 Agent 选，只要前后一致）|
 | 7 | wrapper 在外层 DOM 上 spread `slotProps?.root`，**不**直接传给 vendor |
-| 8 | 未用 `propMapping` 做 number/Date 值转换（只用于改名 prop）|
+| 8 | 未用 `propMapping` 做需要值变换的 prop（`propMapping` 只能改名，不能转值）|
 | 9 | Agent 走完 `wrap-up-prompt.md`，输出 artifacts |
 
 **最低底线**：1 + 2 + 3 + 4 全部满足。

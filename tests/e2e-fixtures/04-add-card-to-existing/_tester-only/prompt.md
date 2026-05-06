@@ -24,7 +24,7 @@
 |---|---|---|
 | 1. 路由 | `cdp-component-add-to-existing-package` | 不重建结构；只加新文件 + 改聚合 |
 | 2. trait 决定 | `cdp-component-traits` | `traits: [COMPONENT_TRAIT.LAYOUT_CONTAINER]`（提供默认 children 区域） |
-| 3. slot 设计 | `cdp-component-slots` | `slots: { header: { title: '头部', defaultEnabled: false }, footer: { title: '底部', defaultEnabled: false } }` |
+| 3. slot 设计 | `cdp-component-slots` | 两个命名 slot：一个对应标题区、一个对应操作区，slot key 名你定（例 `header`/`footer`、或 `titleSlot`/`actionSlot`）；都含 `title` 且 `defaultEnabled: false` |
 | 4. props/meta | `cdp-component-manifest-basics` | `props.title` 字段含 `title: '卡片标题'`；`meta.category: COMPONENT_CATEGORY.LAYOUT` |
 | 5. 注册 | — | Card manifest 纳入既有组件包注册入口；不重写 plugin 引导结构 |
 | 6. 自检 | （可选）`cdp-component-manifest-validation` | `validateManifest()` 通过 |
@@ -70,8 +70,8 @@ src/
 | 5 | `package.json` 不新增依赖 |
 | 6 | `npx tsc --noEmit` 通过 |
 | 7 | `validateManifest(plugin)` 通过 |
-| 8 | manifest 含 `traits: [LAYOUT_CONTAINER]` + `slots: { header, footer }` 各含 `title` |
-| 9 | 实现侧渲染 `_slots.header` / `_slots.footer`（**不**用 React children 凑数） |
+| 8 | manifest 含 `traits: [LAYOUT_CONTAINER]` + 两个命名 slot（语义上一个对应标题区、一个对应操作区，key 名不限），各含 `title` |
+| 9 | 实现侧用 `_slots[<对应 slot key>]` 渲染标题区与操作区（**不**用 React children 凑数） |
 | 10 | Agent 走完 `wrap-up-prompt.md`，输出 artifacts |
 
 **最低底线**：1 + 2 + 3 + 4 + 6 全部满足。

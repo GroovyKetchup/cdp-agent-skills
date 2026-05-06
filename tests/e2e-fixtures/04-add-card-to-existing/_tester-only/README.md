@@ -8,11 +8,14 @@
 
 ## 评分要点
 
+> **结果导向**：契约 50 + 漏洞 30 + 完成 20 = 100。skill 路由仅作诊断观测（不计分）。
+
 | 维度 | 关注 |
 |---|---|
-| 路由 | 主调 `cdp-component-add-to-existing-package`（**不是** getting-started）；按需 `traits` / `slots` / `manifest-basics` |
-| 决策 | **只新增**：Card 组件实现 + manifest，并把 Card 纳入既有组件包注册入口；不重写 plugin / 构建工具 / ColorField；slots `header` / `footer` 含 `title`；type 同命名空间（`acme.Card`） |
-| 漏洞 | 重建组件包结构 / 替换构建工具；改写不相关组件；漏聚合或 plugin 注册；漏 slot `title`；用 `<header>{children}</header>` 凑数而非 `_slots.header` |
+| CDP 契约落地 (50) | **只新增**：Card 组件 + manifest 接入既有组件包注册入口；不重写包结构 / plugin / 构建工具；ColorField 字节级未变；trait `[LAYOUT_CONTAINER]`（不要 DATA_CONTAINER）；slots `header`/`footer` 含 `title`；实现侧渲染 `_slots.header` / `_slots.footer`（不用 React children 凑数） |
+| 漏洞回避 (30) | 重建组件包结构 / 替换构建工具；改写 ColorField 等无关组件；创建 manifest 但未接入注册入口；漏 slot `title`；忘渲染 `_slots`；误以为 LAYOUT_CONTAINER 必须配 slots |
+| 任务完成度 (20) | 终止标识最低底线全满足；`validateManifest(plugin)` 通过；走完 wrap-up |
+| 诊断观测（不计分） | 期望主调 `cdp-component-add-to-existing-package`（**不是** getting-started），串联 traits / slots / manifest-basics |
 
 完整评分表 → `../../../e2e-evaluation-template.md` "场景 04" 段
 完整设计依据 → `../../../e2e-test-matrix.md` "场景 04" 段

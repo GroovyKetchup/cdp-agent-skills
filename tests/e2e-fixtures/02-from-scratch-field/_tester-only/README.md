@@ -8,11 +8,14 @@
 
 ## 评分要点
 
+> **结果导向**：契约 50 + 漏洞 30 + 完成 20 = 100。skill 路由仅作诊断观测（不计分）。
+
 | 维度 | 关注 |
 |---|---|
-| 路由 | 5 skill 串联：`getting-started` → `manifest-basics` → `traits` → `events-actions-state` → `manifest-validation` |
-| 决策 | DATA_FIELD trait + `valueSchema` + `meta.title/category` + props.title；`forwardRef` + ref 上 `[COMPONENT_STATE_KEY]`；`onChange(nextValue)` 不传 event |
-| 漏洞 | 重复声明 DATA_FIELD 自动注入字段（`value`/`readOnly`/`required`/`name`/`label`）；重复声明 `getValue`/`setValue`/`valueChange`；漏 `meta.title`；漏 props 字段 `title`；凭印象 category（应是 `DataEntry`） |
+| CDP 契约落地 (50) | DATA_FIELD trait + `valueSchema` + `meta.title/category=DataEntry`；不重复声明 DATA_FIELD 自动注入字段（`value`/`readOnly`/`required`/`name`/`label`/`getValue`/`setValue`/`valueChange`）；`onChange(nextValue)` 不传 event；`validateManifest()` + `printValidationResult()` 自检 |
+| 漏洞回避 (30) | 上述重复声明；`onChange` 传整个 event；漏 `meta.title` / `props.title`；凭印象 category；主动扩张 manifest 表面（用户没要求加 loading/clear action 等） |
+| 任务完成度 (20) | 终止标识最低底线全满足；`forwardRef` + ref 上 `[COMPONENT_STATE_KEY]`；走完 wrap-up |
+| 诊断观测（不计分） | 期望主调 `cdp-component-getting-started`，串联 manifest-basics / traits / events-actions-state / manifest-validation |
 
 完整评分表 → `../../../e2e-evaluation-template.md` "场景 02" 段
 完整设计依据 → `../../../e2e-test-matrix.md` "场景 02" 段

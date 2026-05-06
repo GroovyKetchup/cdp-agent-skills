@@ -12,8 +12,8 @@
 
 | # | 文件 | 说明 |
 |---|---|---|
-| 1 | `tests/e2e-evaluation-template.md` | 评分维度 + Gate 1 门槛 + 该场景的"路由 / 决策 / 漏洞"细分表 |
-| 2 | `tests/e2e-test-matrix.md` "场景 NN" 段 | 期望 skill 路由 + 必须回避漏洞 + 期望产物结构（Judge 判分依据）|
+| 1 | `tests/e2e-evaluation-template.md` | 评分维度 + Gate 1 门槛 + 该场景的"契约落地 / 漏洞回避 / 任务完成度 / 诊断观测"细分表 |
+| 2 | `tests/e2e-test-matrix.md` "场景 NN" 段 | 期望 skill 路由（诊断信号，不计分）+ 必须回避漏洞 + 期望产物结构（Judge 判分依据）|
 | 3 | `tests/e2e-fixtures/<场景>/_tester-only/README.md` | 该场景的"评分要点"和"测试者贴士" |
 | 4 | `tests/e2e-fixtures/<场景>/_tester-only/prompt.md` | 该场景的"用户请求"原文 + 预设答案表 + 不应出现的行为 |
 | 5 | `e2e-results/<日期>/<LLM-IDE>/<场景>/transcript.md` | **被测对象**：测试者从 IDE 导出的完整对话 |
@@ -42,9 +42,10 @@
 3. **不温柔**。Agent 行为偏离 rubric 期望就按 rubric 扣，不要因为"理解 Agent 意图也算合理"而手软。
 4. **不严苛**。rubric 没明文反对的，不能扣分。
 5. **不脑补 transcript 之外的内容**。Agent 没说就是没说，不能假定 Agent "应该是想这么做"。
-6. **路由判分按"实际是否调用了 skill"判**。Agent 写出与 skill 相同思路 ≠ 调用了 skill。判定证据：transcript 里 Agent 是否明确读取/引用 skill 文件，或 IDE 工具调用日志显示 skill 被加载。
-7. **如果证据不充分**（比如 transcript 缺失关键段），把对应项标 `evidence_insufficient: true`，不要凭印象填分。
-8. **文件名 / 路径只作定位线索**。判分按**语义 / 契约**：如果 Agent 用同义结构实现同一注册点（例如把 manifest 数组内联到 `EngineComponentPackage.components`，而不是单独建 `components.ts`），且产物满足 SDK 契约，不因文件名不同扣分；只有 fixture 明确要求保护的既有文件 / 目录（如 vendor、已有组件）才按字节级路径核验。
+6. **轨道 A（计分）与轨道 B（诊断观测）严格分离**。Agent 是否调用期望主调 skill **不影响评分**，只填结 routing_diagnostics（诊断表）。轨道 A 三维度（契约落地 / 漏洞回避 / 任务完成度）只看产物与行为是否符合 CDP 契约与场景需求，无论是否走了 skill。Agent 读 SDK / 凭经验 / 其他途径达到同等产出 → 轨道 A 照样给分，只在 routing_diagnostics.alternative_path 记录。
+7. **路由证据**。诊断表里填"期望主调 skill 是否被调用"时判据：transcript 里 Agent 是否明确读取/引用 skill 文件，或 IDE 工具调用日志显示 skill 被加载。写出与 skill 相同思路 ≠ 调用了 skill。
+8. **如果证据不充分**（比如 transcript 缺失关键段），把对应项标 `evidence_insufficient: true`，不要凭印象填分。
+9. **文件名 / 路径只作定位线索**。判分按**语义 / 契约**：如果 Agent 用同义结构实现同一注册点（例如把 manifest 数组内联到 `EngineComponentPackage.components`，而不是单独建 `components.ts`），且产物满足 SDK 契约，不因文件名不同扣分；只有 fixture 明确要求保护的既有文件 / 目录（如 vendor、已有组件）才按字节级路径核验。
 
 # 输入
 
@@ -75,33 +76,20 @@ JSON schema：
 {
   "scenario_id": "01-zero-knowledge",
   "judge_model": "<你自己的模型名，如 gpt-4o-2024-11-20>",
+  "worker_model": "<被评 Agent 的模型名，从 transcript 推定或测试者贴出>",
   "judge_session_id": "<可选：会话 ID 或自定义标识>",
   "evidence_quality": "sufficient | partial | insufficient",
-  "routing": {
+  "contract_compliance": {
     "score": 0,
-    "max": 40,
+    "max": 50,
     "items": [
       {
-        "name": "主调 skill = cdp-component-getting-started",
-        "expected": "Agent 至少一次明确调用 / 引用该 skill",
-        "actual": "<Agent 实际行为简述>",
-        "score": 0,
-        "max": 20,
-        "evidence": ["transcript.md:L42-L47", "artifacts/self-report.md:L8"]
-      }
-    ]
-  },
-  "decision": {
-    "score": 0,
-    "max": 30,
-    "items": [
-      {
-        "name": "<rubric 中的决策项名>",
+        "name": "<rubric 中的契约项名，如 '0 组件骨架契约齐全'>",
         "expected": "<rubric 期望>",
-        "actual": "<实际>",
+        "actual": "<实际产物 / 行为简述>",
         "score": 0,
-        "max": 10,
-        "evidence": ["transcript.md:L120"]
+        "max": 12,
+        "evidence": ["artifacts/code/src/plugin.ts:L5-L18", "transcript.md:L120"]
       }
     ]
   },
@@ -118,8 +106,32 @@ JSON schema：
       }
     ]
   },
+  "task_completion": {
+    "score": 0,
+    "max": 20,
+    "items": [
+      {
+        "name": "<rubric 中的完成度项名>",
+        "expected": "<rubric 期望>",
+        "actual": "<实际>",
+        "score": 0,
+        "max": 12,
+        "evidence": ["transcript.md:L200"]
+      }
+    ]
+  },
   "total": 0,
   "max_total": 100,
+  "routing_diagnostics": {
+    "_note": "轨道 B 诊断观测，不计入 total；用于反推 skill 设计是否需改",
+    "expected_primary_skill": "<如 'cdp-component-getting-started'，多个用逗号>",
+    "primary_skill_triggered": false,
+    "expected_secondary_skills": ["<如 'manifest-basics'>"],
+    "secondary_triggered_count": 0,
+    "adoption_depth": "low | med | high | n/a",
+    "alternative_path": "<没用 skill 时走了什么：读 SDK / 凭经验 / 其他，简述证据>",
+    "evidence": ["transcript.md:L8-L12"]
+  },
   "summary": {
     "highlights": ["<不超过 3 条，Agent 表现亮点；无则空数组>"],
     "concerns": ["<不超过 3 条，最影响判分的行为>"],
@@ -130,12 +142,13 @@ JSON schema：
 
 # 评分计算细节
 
-- routing.score = sum(items[].score)
-- decision.score = sum(items[].score)
+- contract_compliance.score = sum(items[].score)
+- task_completion.score = sum(items[].score)
 - vulnerability_avoidance.score = max(0, 30 - sum(deductions[].deduction))
   - 🅰 漏洞 occurred=true → deduction 默认 10（按场景 rubric，部分 🅱 漏洞为 5；以 evaluation-template.md 该场景段为准）
   - 🅱 漏洞默认 5（同上）
-- total = routing.score + decision.score + vulnerability_avoidance.score
+- total = contract_compliance.score + vulnerability_avoidance.score + task_completion.score
+- **routing_diagnostics 不计入 total**，仅作诊断信号
 
 # 边界
 
@@ -165,6 +178,7 @@ JSON schema：
 ---
 
 ## 3. summary.md 评审（9 场景跑完后）
+
 
 跑完所有 9 场景，9 个 score.md JSON 都齐了之后，再开**一个新会话**做汇总。
 
@@ -203,19 +217,23 @@ JSON schema：
 | 指标 | 门槛 | 实际 | 通过 |
 |---|---|---|---|
 | Tier A 平均分 | ≥ 80 | ... | ☑/☐ |
-| 任何单场景路由 | ≥ 70 | min: ... | ☑/☐ |
+| 任何单场景"CDP 契约落地" | ≥ 35/50（70%） | min: ... | ☑/☐ |
 | 🅰 漏洞总数 | ≤ 2 | ... | ☑/☐ |
 | 🅰 漏洞 0 出现场景数 | ≥ 6 | ... | ☑/☐ |
+| **仅诊断** 期望主调 skill 触发率 | — | __/9 | — |
 
 **综合判定**：☑ 通过 / ☐ 不通过 — <一句话理由>
 
 ## 9 场景汇总表
-（按 evaluation-template § "9 场景汇总表" 的列填）
+（按 evaluation-template § "9 场景汇总表" 的列填：契约 50 / 漏洞 30 / 完成 20 / 总分 / 主调触发）
 
 ## 关键发现
 - 表现最好场景：...（总分 + 1 句亮点）
 - 表现最差场景：...（总分 + 1 句问题）
 - 出现的 🅰 漏洞清单（场景 → 漏洞名）
+- **轨道 B 诊断**：
+  - 期望主调 skill 未触发的场景清单（跳调但分数高 → skill 触发词 / 定位待优化；跳调且分数低 → skill 内容质量问题）
+  - 替代路径分布（读 SDK / 凭经验 / 其他）
 
 ## 下一步建议
 按 evaluation-template "跑测后处理" 段：是否进 Gate 2 / 修哪个 skill / 重跑哪个场景

@@ -12,7 +12,7 @@
 |---|---|
 | DataTable type 名 | `acme.DataTable` |
 | 数据源 | dataBindings 接受 `list` 字段，最小可用即可 |
-| 列定义结构 | `Array<{ key: string, dataIndex: string, title: string }>` |
+| 列定义结构 | 必含三类字段：唯一标识字段（例 `key` / `id`，名字你定）+ 数据字段绑定字段（例 `dataIndex` / `field`）+ 标题字段（例 `title` / `label`） |
 | 列模板 scope | `record`（当前行）+ `index`（行索引） |
 | 是否要排序/分页 | 不要 |
 
@@ -39,8 +39,8 @@ slots: {
     description: '每列的自定义渲染模板',
     dynamic: true,
     dynamicSource: 'columns',
-    dynamicKey: '{key}',                // 模板插值，从 column 对象取 key 字段
-    dynamicTitle: '{title}',
+    dynamicKey: '{key}',                // 模板插值：填入你在列对象上选的唯一标识字段名（下同例是 `key`，若选 `id` 则写 `'{id}'`）
+    dynamicTitle: '{title}',            // 模板插值：填入标题字段名
     scoped: true,
     scopeDescription: 'record（当前行数据）+ index（行索引）',
   },
@@ -61,7 +61,8 @@ const DataTable = forwardRef<unknown, DataTableProps>(function DataTable(
           <tr key={index}>
             {columns?.map((col) => (
               <td key={col.key}>
-                {/* 优先使用作用域 slot，回落到 dataIndex 默认渲染 */}
+                {/* 优先使用作用域 slot，回落到数据字段默认渲染 */}
+                {/* 下例以 col.key / col.dataIndex 为示例；若你选了别的字段名上面三个都要同步换 */}
                 {_scopedSlots?.[col.key]?.({ record, index }) ?? record[col.dataIndex]}
               </td>
             ))}
@@ -81,7 +82,7 @@ const DataTable = forwardRef<unknown, DataTableProps>(function DataTable(
 - 🅰 漏 `dynamicSource` 或 `dynamicKey`
 - 🅰 漏 `scoped: true`（列模板需要 record 上下文）
 - 🅰 实现侧用 `_slots[name]` 而非 `_scopedSlots[name]`
-- 🅰 `dynamicKey` 写成 `:key` / `${key}` 等错误模板语法（项目约定是 `{key}`）
+- 🅰 `dynamicKey` 模板语法错（项目约定是 `{<字段名>}`，误例：`:key` / `${key}` / `[key]`）
 - 🅰 用 React render prop 自建 context 替代 SDK scoped slot 机制
 - 🅱 columns 数组里 `dataIndex` 不用 `format: 'dataField'`（设计器渲染普通文本框，丢失字段选择器）
 - 🅱 columns 嵌套字段缺 `title`
@@ -96,9 +97,9 @@ const DataTable = forwardRef<unknown, DataTableProps>(function DataTable(
 | 2 | `src/components.ts` + `src/plugin.ts` 注册 |
 | 3 | `npx tsc --noEmit` 通过 |
 | 4 | `validateManifest(plugin)` 通过 |
-| 5 | manifest 含 `slots.cellTemplate` 三件套：`dynamic: true` + `dynamicSource: 'columns'` + `dynamicKey: '{key}'` + `scoped: true` |
-| 6 | 实现侧调 `_scopedSlots[col.key]?.({ record, index })`（**不**用 `_slots`）|
-| 7 | columns 数组 schema 含 `dataIndex` 用 `format: 'dataField'` |
+| 5 | manifest 含 `slots.cellTemplate` 三件套：`dynamic: true` + `dynamicSource: 'columns'` + `dynamicKey: '{<列唯一标识字段名>}'` + `scoped: true`（+ `scopeDescription`）|
+| 6 | 实现侧调 `_scopedSlots[col.<唯一标识字段>]?.({ record, index })`（**不**用 `_slots`）|
+| 7 | columns 数组 schema 中、与数据绑定相关的字段（例 `dataIndex` / `field`）用 `format: 'dataField'` |
 | 8 | columns 不写死在 manifest，由 props 配置 |
 | 9 | Agent 走完 `wrap-up-prompt.md`，输出 artifacts |
 

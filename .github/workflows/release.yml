@@ -1,0 +1,54 @@
+name: Release cdp-agent-skills
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm install --no-fund --no-audit
+
+      - name: Run tests
+        run: npm test
+
+      - name: Pack release tarball
+        id: pack
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          npm pack --json > pack-output.json
+          tarball="$(node --input-type=module -e 'import { readFileSync } from "node:fs"; const parsed = JSON.parse(readFileSync("pack-output.json", "utf8")); const filename = Array.isArray(parsed) ? parsed.at(-1)?.filename : parsed?.filename; if (!filename) { throw new Error("npm pack --json did not return a filename"); } process.stdout.write(filename);')"
+          rm pack-output.json
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+
+      - name: Upload tarball to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.pack.outputs.tarball }}
+          generate_release_notes: true
+
+      - name: Publish to npm
+        if: startsWith(github.ref, 'refs/tags/v')
+        # 首次发布使用 NPM_TOKEN；待 npm 上为该包配置 Trusted Publisher (OIDC) 后，
+        # 可移除 NODE_AUTH_TOKEN 并改回 `npm publish --provenance --access public`
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

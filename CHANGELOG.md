@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-05-07
+
+### Changed
+
+- **`install` 交互式 agent 选择改为编号菜单**：原先需手动输入 agent id（易拼错），现在打印编号列表（1-10），支持输入数字、agent id 或直接回车走默认 `windsurf`；无效输入会重新询问而不是直接报错。向后兼容旧的 id 输入方式。
+
+
 ### Added
 
 - **端到端验证矩阵（Gate 1）**：`tests/e2e-test-matrix.md` 定义 9 场景验证方案（5 Tier A 必跑 + 4 Tier B 进阶），含三 Gate 投产门槛（内部 MVP / 跨 LLM × IDE 矩阵 / 真实开发者灰度）。

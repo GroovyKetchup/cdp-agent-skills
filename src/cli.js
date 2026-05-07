@@ -63,9 +63,31 @@ async function promptForInstallOptions(args) {
 
   try {
     if (!nextArgs.agent) {
-      console.log(`Select agent (${listAgents().map((agent) => agent.id).join(', ')})`);
-      const answer = await rl.question('Agent: ');
-      nextArgs.agent = answer.trim() || 'windsurf';
+      const agentList = listAgents();
+      console.log('Select agent:');
+      agentList.forEach((agent, index) => {
+        const marker = agent.id === 'windsurf' ? ' (default)' : '';
+        console.log(`  ${String(index + 1).padStart(2, ' ')}) ${agent.id.padEnd(13, ' ')} - ${agent.label}${marker}`);
+      });
+      const validIds = new Set(agentList.map((agent) => agent.id));
+      while (!nextArgs.agent) {
+        const answer = (await rl.question('Enter number or id [1]: ')).trim();
+        if (!answer) {
+          nextArgs.agent = 'windsurf';
+          break;
+        }
+        if (/^\d+$/.test(answer)) {
+          const index = Number.parseInt(answer, 10) - 1;
+          if (index >= 0 && index < agentList.length) {
+            nextArgs.agent = agentList[index].id;
+            break;
+          }
+        } else if (validIds.has(answer)) {
+          nextArgs.agent = answer;
+          break;
+        }
+        console.log(`Invalid selection: ${answer}. Please enter 1-${agentList.length} or a valid agent id.`);
+      }
     }
 
     if (!nextArgs.all && !nextArgs.skills) {

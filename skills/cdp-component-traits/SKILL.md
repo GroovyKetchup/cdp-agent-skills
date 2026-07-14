@@ -68,12 +68,12 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 
 声明 `COMPONENT_TRAIT.INTERACTION_DRILLABLE` 后，宿主 Feature 自动维护并注入：
 
-- Prop：`drillPath`、`onDrillNavigateRequest`
-- Event：`drill:navigateRequest`
+- Prop：`drillPath`、`onDrillNavigateRequest`、`onDrillResetRequest`
+- Event：`drill:navigateRequest`、`drill:resetRequest`
 - Actions：`drillPush`、`drillPopTo`、`drillReset`
 - State：`drillPath`
 
-组件只接收 `drillPath` 展示路径，并在用户选择历史节点时调用 `onDrillNavigateRequest({ index })`。不要在组件内维护第二份路径，也不要在 manifest 重复声明上述字段。路径 UI 应复用所属外置 UI 库的共享视图；SDK 不提供 Hook、HOC 或 UI。
+组件只接收 `drillPath` 展示路径，选择历史节点时调用 `onDrillNavigateRequest({ index })`，返回根层时调用 `onDrillResetRequest()`。不要在组件内维护第二份路径，也不要在 manifest 重复声明上述字段。路径 UI 应复用所属外置 UI 库的共享视图；SDK 不提供 Hook、HOC 或 UI。
 
 ## 引导路径
 
@@ -83,6 +83,7 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 - `node_modules/cdp-material-sdk/docs/component-development/recipes/声明数据容器组件.md`
 - `node_modules/cdp-material-sdk/docs/component-development/recipes/声明布局容器组件.md`
 - `node_modules/cdp-material-sdk/docs/component-development/reference/Traits能力模型.md`
+- `node_modules/cdp-material-sdk/docs/component-development/recipes/声明层级下钻能力.md`
 - `node_modules/cdp-material-sdk/docs/component-development/reference/层级下钻能力模型.md`
 
 `references/` 仅作为导航与 fallback 提示。
@@ -128,4 +129,5 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 - `cdp-material-sdk/docs/component-development/recipes/声明数据容器组件.md`
 - `cdp-material-sdk/docs/component-development/recipes/声明布局容器组件.md`
 - `cdp-material-sdk/docs/component-development/reference/Traits能力模型.md`
+- `cdp-material-sdk/docs/component-development/recipes/声明层级下钻能力.md`
 - `cdp-material-sdk/docs/component-development/reference/层级下钻能力模型.md`

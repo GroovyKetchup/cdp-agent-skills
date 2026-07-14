@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `cdp-component-traits` 增加 `INTERACTION_DRILLABLE` 路由和受控下钻约束，并同步 getting-started、事件/动作/状态及排错入口。
+
 ## [0.1.1] - 2026-05-07
 
 ### Changed

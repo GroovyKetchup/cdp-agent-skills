@@ -1,17 +1,18 @@
 ---
 name: cdp-component-traits
-description: Use when a CDP component needs DATA_FIELD value semantics, DATA_CONTAINER data scope, LAYOUT_CONTAINER default children area, or nesting constraints (allowedChildren / allowedParents).
+description: Use when a CDP component needs DATA_FIELD value semantics, DATA_CONTAINER data scope, LAYOUT_CONTAINER default children area, INTERACTION_DRILLABLE controlled drill behavior, or nesting constraints (allowedChildren / allowedParents).
 ---
 
 # 声明 Traits
 
 ## 概述
 
-CDP 三种 trait 互不互斥，按组件形态组合声明：
+CDP traits 互不互斥，按组件形态组合声明：
 
 - `DATA_FIELD`：单值字段（value / onChange）
 - `DATA_CONTAINER`：管理子字段数据作用域
 - `LAYOUT_CONTAINER`：默认 children 区域开关
+- `INTERACTION_DRILLABLE`：宿主管理状态的层级下钻能力
 
 `nesting` 配合 `LAYOUT_CONTAINER` 限制可拖入的子 / 父类型。
 
@@ -25,6 +26,7 @@ CDP 三种 trait 互不互斥，按组件形态组合声明：
 | 通用布局容器（Card / Section / Grid） | `LAYOUT_CONTAINER` |
 | 强组合关系（Tabs / Steps / Collapse） | `LAYOUT_CONTAINER` + `nesting.allowedChildren` / `allowedParents` |
 | 仅展示（Text / Icon / Badge） | 不声明 trait |
+| 层级下钻（Chart / Table / CardList） | `INTERACTION_DRILLABLE` |
 | 仅具名/作用域/动态插槽，无默认 children 主区 | 不在本 skill，走 `cdp-component-slots` |
 
 `LAYOUT_CONTAINER` 与 `manifest.slots` **正交**：只用 slots 不需要本 trait；slots 工作流走 `cdp-component-slots` skill。
@@ -62,6 +64,17 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 
 `nesting.allowedChildren` 与 `slots.allowedChildren` 是不同字段：前者管默认 children 区域，后者管具名 slot 区域。
 
+## INTERACTION_DRILLABLE：受控下钻
+
+声明 `COMPONENT_TRAIT.INTERACTION_DRILLABLE` 后，宿主 Feature 自动维护并注入：
+
+- Prop：`drillPath`、`onDrillNavigateRequest`
+- Event：`drill:navigateRequest`
+- Actions：`drillPush`、`drillPopTo`、`drillReset`
+- State：`drillPath`
+
+组件只接收 `drillPath` 展示路径，并在用户选择历史节点时调用 `onDrillNavigateRequest({ index })`。不要在组件内维护第二份路径，也不要在 manifest 重复声明上述字段。路径 UI 应复用所属外置 UI 库的共享视图；SDK 不提供 Hook、HOC 或 UI。
+
 ## 引导路径
 
 事实源（优先读取目标项目本地 SDK 文档）：
@@ -70,6 +83,7 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 - `node_modules/cdp-material-sdk/docs/component-development/recipes/声明数据容器组件.md`
 - `node_modules/cdp-material-sdk/docs/component-development/recipes/声明布局容器组件.md`
 - `node_modules/cdp-material-sdk/docs/component-development/reference/Traits能力模型.md`
+- `node_modules/cdp-material-sdk/docs/component-development/reference/层级下钻能力模型.md`
 
 `references/` 仅作为导航与 fallback 提示。
 
@@ -79,7 +93,8 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 2. 子内容形态：默认 children 主区 → `LAYOUT_CONTAINER`（+ `nesting`）；具名 / 作用域 / 动态插槽 → `cdp-component-slots` skill。
 3. 数据角色：单值 → `DATA_FIELD` + `valueSchema`（勿重复声明自动注入字段）；容器 → `DATA_CONTAINER` + `valueSchema` + `DataScope`。
 4. 实现侧契约：DATA_FIELD 调用 `onChange(nextValue)`、应用 `readOnly` / `required`；DATA_CONTAINER 包 `DataScope`、读数据用 `useDataContainerApi`；LAYOUT_CONTAINER 渲染 `{children}`。
-5. 修改 manifest 后从 `cdp-material-sdk/portable` 导入 `validateManifest` 执行校验。
+5. 下钻能力：声明 `INTERACTION_DRILLABLE`，使用受控 props 展示路径，不重复声明或维护 trait 自动提供的契约。
+6. 修改 manifest 后从 `cdp-material-sdk/portable` 导入 `validateManifest` 执行校验。
 
 ## 常见错误
 
@@ -95,6 +110,7 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 | Tabs 用 slots 命名 panel1 / panel2 硬编码 | 改用 `LAYOUT_CONTAINER` + `nesting.allowedChildren: ['TabPane']` |
 | 用 `slots.allowedChildren` 限制默认 children 子类型 | 用 `nesting.allowedChildren`；slots.allowedChildren 是约束 slot 区域 |
 | 误以为 `LAYOUT_CONTAINER` 必须同时声明 slots | 二者正交；只有匿名主区时不需要 slots |
+| 每个组件自己维护 `drillPath` 或重复声明下钻 actions/state | 删除本地状态和重复 manifest 字段，改为 `INTERACTION_DRILLABLE` + 受控 props |
 
 ## 完成检查
 
@@ -104,6 +120,7 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 - [ ] Form 类同时拖入子组件 → 同时声明 `LAYOUT_CONTAINER`
 - [ ] LAYOUT_CONTAINER：组件实际渲染 `{children}`；`nesting` 中 type 真实存在；强组合双向声明
 - [ ] `validateManifest()` 无 error
+- [ ] DRILLABLE：只声明 trait；组件受控渲染 `drillPath` 并发出导航请求，无第二份路径状态
 
 ## 维护来源
 
@@ -111,3 +128,4 @@ manifest 里只写**业务专属** props（如 `placeholder`、`options`）；`m
 - `cdp-material-sdk/docs/component-development/recipes/声明数据容器组件.md`
 - `cdp-material-sdk/docs/component-development/recipes/声明布局容器组件.md`
 - `cdp-material-sdk/docs/component-development/reference/Traits能力模型.md`
+- `cdp-material-sdk/docs/component-development/reference/层级下钻能力模型.md`

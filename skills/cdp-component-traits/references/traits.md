@@ -13,6 +13,7 @@ sdk-docs:
 - DATA_FIELD：`node_modules/cdp-material-sdk/docs/component-development/recipes/声明数据字段组件.md`
 - DATA_CONTAINER：`node_modules/cdp-material-sdk/docs/component-development/recipes/声明数据容器组件.md`
 - LAYOUT_CONTAINER + nesting：`node_modules/cdp-material-sdk/docs/component-development/recipes/声明布局容器组件.md`
+- INTERACTION_DRILLABLE：`node_modules/cdp-material-sdk/docs/component-development/reference/层级下钻能力模型.md`
 - 自动注入清单 / 模型边界：`node_modules/cdp-material-sdk/docs/component-development/reference/Traits能力模型.md`
 - valueSchema 选择 / 校验级别：`node_modules/cdp-material-sdk/docs/component-development/reference/validateManifest校验规则.md`
 

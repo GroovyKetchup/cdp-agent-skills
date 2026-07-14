@@ -107,7 +107,7 @@ npx cdp-agent-skills doctor --agent windsurf
 | `cdp-component-add-to-existing-package` | 主线（增量） | 在已有组件包中新增、注册并验证 1 个组件 |
 | `cdp-component-manifest-validation` | 主线（排错入口） | 校验工具速查 + SDK 导入边界 + "症状 → 原子 skill"路由；交付前自检 |
 | `cdp-component-manifest-basics` | 原子 | manifest 必填字段（type / meta.title / meta.category） + props（JSON Schema） + designer meta |
-| `cdp-component-traits` | 原子 | `DATA_FIELD` / `DATA_CONTAINER` / `LAYOUT_CONTAINER` 声明，DataScope 与 valueSchema |
+| `cdp-component-traits` | 原子 | `DATA_FIELD` / `DATA_CONTAINER` / `LAYOUT_CONTAINER` / `INTERACTION_DRILLABLE` 声明，DataScope、valueSchema 与受控下钻契约 |
 | `cdp-component-events-actions-state` | 原子 | 标准/自定义事件 + 命令式 actions + 暴露 state（COMPONENT_STATE_KEY） |
 | `cdp-component-slots` | 原子 | 命名 / 动态 / 作用域 slots（含 `_slots` 渲染与 `dynamicSource`） |
 | `cdp-component-runtime-behavior` | 原子 | rootPath 配置（INJECT_PATH_SLOT_PROPS）+ Loading 策略（native / wrapper / none / useDualLoading） |

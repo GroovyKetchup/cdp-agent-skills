@@ -79,6 +79,7 @@ const missingStates = diagnoseMissingStateKeys(
 | state 拿到旧值 / 空值 | useImperativeHandle deps 数组；COMPONENT_STATE_KEY 暴露 | `cdp-component-events-actions-state` |
 | loading 不响应 / 设计器无遮罩 | 策略选型 native / wrapper / none；prop 名 | `cdp-component-runtime-behavior` |
 | Form 子字段拿不到值 / 路径错 | DataScope 是否包；getRecord 引用稳定性 | `cdp-component-traits` |
+| 下钻路径不更新 / 返回请求无响应 | 是否声明 INTERACTION_DRILLABLE；是否使用受控 drillPath / onDrillNavigateRequest | `cdp-component-traits` |
 | 设计器显示插槽但运行时无内容 | 组件是否实际渲染 `_slots[name]` | `cdp-component-slots` |
 | 物料面板找不到组件 | meta.title / category；hiddenInComponentList 是否误开 | `cdp-component-manifest-basics` |
 

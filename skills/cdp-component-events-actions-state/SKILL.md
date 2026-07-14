@@ -18,6 +18,7 @@ description: Use when declaring outbound events, imperative component methods (a
 | 外部表达式需要读取组件运行时数据（loading、selectedRowKeys） | `state` |
 | 子内容承载（命名 / 作用域 / 动态插槽） | **不在本 skill** —— 走 `cdp-component-slots` |
 | DATA_FIELD 自动注入的 `valueChange` / `getValue` / `setValue` / `value` 等 | **不在本 skill** —— 见 `cdp-component-traits`，**勿重复声明** |
+| INTERACTION_DRILLABLE 自动注入的下钻事件 / actions / state | **不在本 skill** —— 见 `cdp-component-traits`，**勿重复声明** |
 | 包装第三方组件 prop 名 / 回调签名不同 | adapter 部分见 `cdp-component-adapter-and-wrap` |
 
 ## events / customEvents 核心约束

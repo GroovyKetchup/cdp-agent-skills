@@ -64,6 +64,7 @@ description: Use when starting a CDP component package from scratch, onboarding 
 |---|---|
 | 必填字段（type / meta.title / meta.category）+ props + designer meta | `cdp-component-manifest-basics` |
 | 数据语义（DATA_FIELD / DATA_CONTAINER / DataScope） | `cdp-component-traits` |
+| 层级下钻（INTERACTION_DRILLABLE / drillPath） | `cdp-component-traits` |
 | 命名 / 动态 / 作用域 slots | `cdp-component-slots` |
 | 自定义事件 / 命令式 actions / 暴露 state | `cdp-component-events-actions-state` |
 | rootPath / Loading 策略 | `cdp-component-runtime-behavior` |

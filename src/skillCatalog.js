@@ -16,7 +16,7 @@ export const SKILL_IDS = [
 ];
 
 export function parseFrontmatter(markdown) {
-  const match = markdown.match(/^---\n([\s\S]*?)\n---\n/);
+  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) {
     throw new Error('Missing YAML frontmatter');
   }
